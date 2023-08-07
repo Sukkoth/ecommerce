@@ -5,7 +5,7 @@ mongoose.set('strictQuery', false);
 const connectToDatabase = () =>
     mongoose
         .connect(db_url, { useNewUrlParser: true })
-        .then(() => console.log('database connected'))
+        .then(() => console.log('DATABASE CONNECTED'))
         .catch((err) => {
             console.log('DB ERROR', err.message);
             process.exit(0);

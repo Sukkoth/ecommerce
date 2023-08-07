@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../../models/Products');
-const createProductValidation = require('../../validation/Product/createProduct');
+const createProductValidation =
+    require('../../validation/Product/createProduct').productValidationSchema;
 const parseValidationErrors = require('../../utils/parseValidationErrors');
 /**
  * @desc Get all products

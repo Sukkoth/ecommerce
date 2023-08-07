@@ -22,4 +22,4 @@ const productValidationSchema = Joi.object({
     variations: Joi.array().items(variationValidationSchema),
 });
 
-module.exports = productValidationSchema;
+module.exports = { productValidationSchema, variationValidationSchema };
