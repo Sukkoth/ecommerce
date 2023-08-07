@@ -39,6 +39,11 @@ router.put('/:productId', productController.updateProduct);
  */
 router.delete('/:productId', productController.deleteProduct);
 
+/**
+ * @desc variation routes for specific product
+ * @route /:productId/variations
+ * @param {string} productId
+ */
 router.use('/:productId/variations', variationRoutes);
 
 module.exports = router;

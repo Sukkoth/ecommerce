@@ -17,6 +17,10 @@ router.get(
  * @route POST /products/:productId/variations
  * @param {string} productId
  */
-router.post('/', variationController.addVariation);
+router.post(
+    '/',
+    variationController.getProduct,
+    variationController.addVariation
+);
 
 module.exports = router;
