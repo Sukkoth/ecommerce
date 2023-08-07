@@ -12,10 +12,16 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        phone: {
+            type: String,
+            required: true,
+        },
         password: {
             type: String,
             required: true,
         },
+        phoneVerifiedAt: Date,
+        emailVerifiedAt: Date,
         firstName: String,
         lastName: String,
         isAdmin: {
@@ -23,6 +29,11 @@ const userSchema = new mongoose.Schema(
             default: false,
         },
         avatarUrl: String,
+        status: {
+            enum: ['active', 'inactive', 'banned'],
+            type: String,
+            default: 'active',
+        },
     },
     {
         timestamps: true,
