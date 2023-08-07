@@ -8,6 +8,8 @@ const attributeSchema = new mongoose.Schema({
 const variationSchema = new mongoose.Schema({
     attributes: [attributeSchema],
     stockQuantity: Number,
+    price: Number,
+    images: [String],
 });
 
 const productSchema = new mongoose.Schema(

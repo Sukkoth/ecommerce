@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const productController = require('../controllers/ProductController');
-
+const productController = require('../../controllers/Product/ProductController');
+const variationRoutes = require('../Product/variationRoutes');
 /**
  * @desc GET all products
  * @route /products
@@ -38,5 +38,7 @@ router.put('/:productId', productController.updateProduct);
  * @returns {string} productId
  */
 router.delete('/:productId', productController.deleteProduct);
+
+router.use('/:productId/variations', variationRoutes);
 
 module.exports = router;

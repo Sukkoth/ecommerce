@@ -1,6 +1,5 @@
 const asyncHandler = require('express-async-handler');
 const categoryValidationSchema = require('../validation/Category/createCategory');
-const updateCategoryValidation = require('../validation/Category/updateCategory');
 const parseValidationErrors = require('../utils/parseValidationErrors');
 const Category = require('../models/Category');
 /**
