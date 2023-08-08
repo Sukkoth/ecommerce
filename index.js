@@ -4,12 +4,28 @@ const env = require('./config/env');
 const connectToDatabase = require('./config/db');
 const morgan = require('morgan');
 const errorMiddleware = require('./src/middleware/errorMiddleware');
-
+const cors = require('cors');
+const path = require('path');
 connectToDatabase();
 
+// Allow requests from specified origins
+const allowedOrigins = ['http://localhost:5173'];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/products', require('./src/routes/Product/productRoutes'));
 app.use('/api/categories', require('./src/routes/categoryRoutes'));
 app.use('/api/users', require('./src/routes/User/userRoutes'));

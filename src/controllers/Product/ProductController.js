@@ -12,18 +12,12 @@ const ModelFeatures = require('../../utils/ModelFeatures');
 const getAllProducts = asyncHandler(async (req, res) => {
   const ProductFeature = new ModelFeatures(Product.find(), req);
 
-  const filteredQuery = ProductFeature.filter().sort();
-  const countQuery = filteredQuery.get().countDocuments().lean();
-
-  const [products, totalCount] = await Promise.all([
-    filteredQuery.paginate().get(),
-    countQuery,
-  ]);
+  const products = await ProductFeature.filter().sort().selectFields().get();
 
   res.json({
     status: 'ok',
     code: '200',
-    totalResults: totalCount,
+    totalResults: await Product.countDocuments(),
     page: req.query.page,
     pageSize: req.query.limit,
     products,
