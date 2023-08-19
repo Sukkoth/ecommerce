@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Cart = require('../../models/Cart');
-const cartValidationSchema =
-  require('../../validation/Cart/createCart').cartValidationSchema;
+const cartItemValidationSchema =
+  require('../../validation/Cart/createCart').cartItemValidationSchema;
 const parseValidationErrors = require('../../utils/parseValidationErrors');
 
 /**
@@ -10,7 +10,7 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
  * @returns {object}
  */
 const getAllCarts = asyncHandler(async (req, res) => {
-  const carts = await Cart.find();
+  const carts = await Cart.findOne({ userId: '64d161922d094064e1c353b6' });
   res.json({
     status: 'ok',
     code: '200',
@@ -25,19 +25,22 @@ const getAllCarts = asyncHandler(async (req, res) => {
  */
 const createCart = asyncHandler(async (req, res) => {
   const { error: validationError, value: validated } =
-    cartValidationSchema.validate(req.body, { abortEarly: false });
+    cartItemValidationSchema.validate(req.body, { abortEarly: false });
 
   if (validationError) {
     res.status(422).json(parseValidationErrors(validationError.details));
   }
 
-  const cart = await Cart.create(validated);
+  const cart = await Cart.findOneAndUpdate(
+    { userId: '64d161922d094064e1c353b6' },
+    { $push: { items: validated } }
+  );
 
   res.status(201).json({
     status: 'ok',
     code: '201',
     message: 'Cart added',
-    data: cart,
+    cart,
   });
 });
 

@@ -3,7 +3,10 @@ const Cart = require('../models/Cart');
 
 exports.cartShouldExist = asyncHandler(async (req, res, next) => {
   const { cartId } = req.params;
-  const cart = await Cart.findById(cartId);
+  const cart = await Cart.findById(cartId).populate({
+    path: 'items.productId',
+    model: 'Product',
+  });
 
   //!check if it exists
   if (!cart) {

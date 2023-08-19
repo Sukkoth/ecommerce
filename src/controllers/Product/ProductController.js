@@ -60,7 +60,7 @@ const getProductById = asyncHandler(async (req, res) => {
   return res.json({
     status: 'ok',
     code: '200',
-    data: req.product,
+    product: req.product,
   });
 });
 
@@ -83,7 +83,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     status: 'ok',
     code: '200',
     message: `Product updated`,
-    data: updatedProduct,
+    product: updatedProduct,
   });
 });
 
