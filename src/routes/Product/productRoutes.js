@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const productController = require('../../controllers/Product/ProductController');
 const variationRoutes = require('../Product/variationRoutes');
+const productShouldExist =
+  require('../../middleware/ProductMiddleware').productShouldExist;
 /**
  * @desc GET all products
  * @route /products
@@ -21,7 +23,7 @@ router.post('/', productController.createProduct);
  * @param {string} productId
  * @returns {object}
  */
-router.get('/:productId', productController.getProductById);
+router.get('/:productId', productShouldExist, productController.getProductById);
 
 /**
  * @desc Update product
@@ -29,7 +31,7 @@ router.get('/:productId', productController.getProductById);
  * @param {string} productId
  * @returns {object}
  */
-router.put('/:productId', productController.updateProduct);
+router.put('/:productId', productShouldExist, productController.updateProduct);
 
 /**
  * @desc Delete product
@@ -37,7 +39,11 @@ router.put('/:productId', productController.updateProduct);
  * @param {string} productId
  * @returns {string} productId
  */
-router.delete('/:productId', productController.deleteProduct);
+router.delete(
+  '/:productId',
+  productShouldExist,
+  productController.deleteProduct
+);
 
 /**
  * @desc variation routes for specific product

@@ -56,23 +56,11 @@ const createProduct = asyncHandler(async (req, res) => {
  * @returns {object}
  */
 const getProductById = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  const product = await Product.findById(productId);
-
-  //!check if it exists
-  if (!product) {
-    return res.status(422).json({
-      message: 'Product not found',
-      code: '422',
-    });
-  }
-
   //*return
   return res.json({
     status: 'ok',
     code: '200',
-    message: `Product by id ${productId}`,
-    product: product,
+    data: req.product,
   });
 });
 
@@ -83,26 +71,19 @@ const getProductById = asyncHandler(async (req, res) => {
  * @returns {object}
  */
 const updateProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  const product = await Product.findById(productId);
-
-  //!check if it exists
-  if (!product) {
-    return res.status(422).json({
-      message: 'Product not found',
-      code: '422',
-    });
-  }
-
   //* update the product
-  const updatedProduct = await Product.findByIdAndUpdate(productId, req.body, {
-    new: true,
-  });
+  const updatedProduct = await Product.findByIdAndUpdate(
+    req.product._id,
+    req.body,
+    {
+      new: true,
+    }
+  );
   res.json({
     status: 'ok',
     code: '200',
-    message: `Product by id ${productId} is updated`,
-    product: updatedProduct,
+    message: `Product updated`,
+    data: updatedProduct,
   });
 });
 
@@ -113,12 +94,12 @@ const updateProduct = asyncHandler(async (req, res) => {
  * @returns {stirng} productId
  */
 const deleteProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
+  const product = await Product.findByIdAndDelete(req.product._id);
   res.json({
     status: 'ok',
     code: '200',
-    message: `Product by id ${productId} is deleted`,
-    id: productId,
+    message: `Product  deleted`,
+    id: product._id,
   });
 });
 
