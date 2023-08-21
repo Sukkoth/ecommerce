@@ -3,12 +3,20 @@ const productController = require('../../controllers/Product/ProductController')
 const variationRoutes = require('../Product/variationRoutes');
 const productShouldExist =
   require('../../middleware/ProductMiddleware').productShouldExist;
+
 /**
  * @desc GET all products
  * @route /products
  * @method GET
  */
 router.get('/', productController.getAllProducts);
+
+/**
+ * @desc GET featured products
+ * @route /products/featured
+ * @method GET
+ */
+router.get('/featured', productController.getFeaturedProducts);
 
 /**
  * @desc Store product

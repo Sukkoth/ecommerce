@@ -103,10 +103,26 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * @desc Get all products
+ * @route GET /products
+ * @returns {object}
+ */
+const getFeaturedProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({}).limit(4);
+  res.json({
+    status: 'ok',
+    code: '200',
+    products,
+  });
+});
+
 module.exports = {
   getAllProducts,
   createProduct,
   getProductById,
   updateProduct,
   deleteProduct,
+
+  getFeaturedProducts,
 };

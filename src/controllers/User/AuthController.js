@@ -5,12 +5,17 @@ const createUserValidation = require('../../validation/User/createUser');
 const parseValidationErrors = require('../../utils/parseValidationErrors');
 const loginValidation = require('../../validation/User/loginUser');
 const generateToken = require('../../utils/generateToken');
+const Cart = require('../../models/Cart');
 /**
  * @desc register a user
  * @route POST /users/auth/register
  * @returns {object} user
  */
 const register = asyncHanlder(async (req, res) => {
+  /**
+   * Add user
+   * create user for the user
+   */
   const { error: validationError, value: validated } =
     createUserValidation.validate(req.body, { abortEarly: false });
 
@@ -20,9 +25,11 @@ const register = asyncHanlder(async (req, res) => {
   const hashedPassword = await bcrypt.hash(validated.password, 10);
 
   const user = await User.create({ ...validated, password: hashedPassword });
+  const cart = await Cart.create({ userId: user._id });
   res.status(201).json({
     message: 'User created',
     user,
+    cart,
   });
 });
 

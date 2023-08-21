@@ -14,7 +14,7 @@ router.get('/', cartController.getAllCarts);
  * @route POST /carts
  * @returns {object}
  */
-router.post('/', cartController.createCart);
+router.post('/', cartController.addToCart);
 
 /**
  * @desc view a single cart
@@ -24,6 +24,13 @@ router.post('/', cartController.createCart);
  */
 router.get('/:cartId', cartShouldExist, cartController.getCartById);
 
+/**
+ * @desc Update cart item
+ * @route PUT /carts/:itemId
+ * @param {string} itemId
+ * @returns {object}
+ */
+router.put('/:itemId', cartController.updateCartItem);
 /**
  * @desc Update cart
  * @route PUT /carts/:cartId
@@ -38,7 +45,7 @@ router.put('/:cartId', cartShouldExist, cartController.updateCart);
  * @param {string} cartId
  * @returns {string} cartId
  */
-router.delete('/:cartId', cartShouldExist, cartController.deleteCart);
+router.delete('/:itemId', cartController.removeFromCart);
 
 // /**
 //  * @desc variation routes for specific cart

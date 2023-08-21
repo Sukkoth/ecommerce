@@ -10,11 +10,14 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
  * @returns {object}
  */
 const getAllCarts = asyncHandler(async (req, res) => {
-  const carts = await Cart.findOne({ userId: '64d161922d094064e1c353b6' });
+  const cart = await Cart.findOne({
+    userId: '64d161922d094064e1c353b6',
+  }).populate({ path: 'items.productId', model: 'Product' });
+
   res.json({
     status: 'ok',
     code: '200',
-    data: carts,
+    data: cart,
   });
 });
 
@@ -23,7 +26,12 @@ const getAllCarts = asyncHandler(async (req, res) => {
  * @route POST /carts
  * @returns {object}
  */
-const createCart = asyncHandler(async (req, res) => {
+const addToCart = asyncHandler(async (req, res) => {
+  /**
+   * Take the items only since the cart is created whenever a new user is registered
+   * Add new cart item to 'items' array.
+   * Take, {productId, variationIndex and quantity}
+   */
   const { error: validationError, value: validated } =
     cartItemValidationSchema.validate(req.body, { abortEarly: false });
 
@@ -31,9 +39,11 @@ const createCart = asyncHandler(async (req, res) => {
     res.status(422).json(parseValidationErrors(validationError.details));
   }
 
+  //TODO Make the userId from auth, remove this manual one
   const cart = await Cart.findOneAndUpdate(
     { userId: '64d161922d094064e1c353b6' },
-    { $push: { items: validated } }
+    { $push: { items: validated } },
+    { new: true }
   );
 
   res.status(201).json({
@@ -93,23 +103,51 @@ const updateCart = asyncHandler(async (req, res) => {
  * @desc delete a cart
  * @route DELETE /carts:cartId
  * @param {string} cartId
- * @returns {stirng} cartId
  */
-const deleteCart = asyncHandler(async (req, res) => {
-  const cart = await Cart.findByIdAndDelete(req.cart._id);
+const updateCartItem = asyncHandler(async (req, res) => {
+  const { itemId } = req.params;
+
+  const cart = await Cart.findOneAndUpdate(
+    { userId: '64d161922d094064e1c353b6', 'items._id': itemId },
+    { $set: { 'items.$': req.body } },
+    { new: true }
+  );
 
   res.json({
     status: 'ok',
     code: '200',
-    message: `Cart  deleted`,
-    id: cart._id,
+    message: 'Cart item updated',
+    cart,
+  });
+});
+
+/**
+ * @desc delete a cart
+ * @route DELETE /carts:cartId
+ * @param {string} cartId
+ */
+const removeFromCart = asyncHandler(async (req, res) => {
+  const { itemId } = req.params;
+
+  const cart = await Cart.findOneAndUpdate(
+    { userId: '64d161922d094064e1c353b6' },
+    { $pull: { items: { _id: itemId } } },
+    { new: true }
+  );
+
+  res.json({
+    status: 'ok',
+    code: '200',
+    message: 'Cart item deleted',
+    cart,
   });
 });
 
 module.exports = {
   getAllCarts,
-  createCart,
+  addToCart,
   getCartById,
   updateCart,
-  deleteCart,
+  updateCartItem,
+  removeFromCart,
 };
