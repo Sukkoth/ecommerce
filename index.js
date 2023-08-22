@@ -9,7 +9,10 @@ const path = require('path');
 connectToDatabase();
 
 // Allow requests from specified origins
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://eshop-2fzq.onrender.com',
+];
 const corsOptions = {
   origin: (origin, callback) => {
     if (allowedOrigins.includes(origin) || !origin) {
