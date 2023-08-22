@@ -19,7 +19,6 @@ class ModelFeatures {
     let queryString = {
       ...this.requestObject.query,
     };
-    console.log('QUERY STRING', queryString.category);
 
     //remove excluded
     const excludedFields = ['page', 'limit', 'sort', 'fields'];
@@ -33,7 +32,10 @@ class ModelFeatures {
       /\b(gt|gte|lt|lte|in)\b/g,
       (match) => `$${match}`
     );
+
     queryString = JSON.parse(queryString);
+    if (queryString.category)
+      queryString.category['$in'] = queryString.category['$in'].split(',');
 
     //store the query
     this.query = this.query.find(queryString);
