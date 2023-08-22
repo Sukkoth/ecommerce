@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 class ModelFeatures {
   /**
    *
@@ -15,7 +16,10 @@ class ModelFeatures {
    */
   filter() {
     //extract query
-    let queryString = { ...this.requestObject.query };
+    let queryString = {
+      ...this.requestObject.query,
+    };
+    console.log('QUERY STRING', queryString.category);
 
     //remove excluded
     const excludedFields = ['page', 'limit', 'sort', 'fields'];
@@ -26,7 +30,7 @@ class ModelFeatures {
     //replace characters
     queryString = JSON.stringify(queryString);
     queryString = queryString.replace(
-      /\b(gt|gte|lt|lte)\b/g,
+      /\b(gt|gte|lt|lte|in)\b/g,
       (match) => `$${match}`
     );
     queryString = JSON.parse(queryString);
@@ -85,11 +89,18 @@ class ModelFeatures {
     return this;
   }
   /**
-   * @desc return the query after executing itF
+   * @desc return the query after executing it
    * @returns {Self}
    */
   get() {
     return this.query;
+  }
+  /**
+   * @desc return the query after executing it but only the total count
+   * @returns {Self}
+   */
+  countDocuments() {
+    return this.query.countDocuments();
   }
 }
 

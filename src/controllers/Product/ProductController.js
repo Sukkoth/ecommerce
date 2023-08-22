@@ -10,16 +10,26 @@ const ModelFeatures = require('../../utils/ModelFeatures');
  * @returns {object}
  */
 const getAllProducts = asyncHandler(async (req, res) => {
-  const ProductFeature = new ModelFeatures(Product.find(), req);
+  //?price[gte]=1000&difficulty=easy&page=4&sort=duration,price&fields=-image,-name&limit=3
+  //?duration[gte]=10&difficulty=easy&sort=-duration,price&fields=secretTour&limit=3&page=3
 
-  const products = await ProductFeature.filter().sort().selectFields().get();
+  //?price[gte]=50
+  const ProductFeature = new ModelFeatures(Product.find(), req);
+  const ProductCount = new ModelFeatures(Product.find(), req);
+
+  const products = await ProductFeature.filter()
+    .sort()
+    .selectFields()
+    .paginate()
+    .get();
+  const productsCount = await ProductCount.filter().countDocuments();
 
   res.json({
     status: 'ok',
     code: '200',
-    totalResults: await Product.countDocuments(),
     page: req.query.page,
     pageSize: req.query.limit,
+    productsCount,
     products,
   });
 });
