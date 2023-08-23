@@ -31,6 +31,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/products', require('./src/routes/Product/productRoutes'));
 app.use('/api/carts', require('./src/routes/Cart/cartRoutes'));
+app.use('/api/wishList', require('./src/routes/WishList/wishListRoutes'));
 app.use('/api/categories', require('./src/routes/categoryRoutes'));
 app.use('/api/users', require('./src/routes/User/userRoutes'));
 app.use(errorMiddleware);

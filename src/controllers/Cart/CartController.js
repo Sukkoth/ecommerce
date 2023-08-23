@@ -39,6 +39,18 @@ const addToCart = asyncHandler(async (req, res) => {
     res.status(422).json(parseValidationErrors(validationError.details));
   }
 
+  const search = await Cart.findOne({
+    'items.productId': validated.productId,
+    'items.variationIndex': validated.variationIndex,
+  });
+
+  if (search) {
+    return res.status(409).json({
+      message: 'Item is already in cart',
+      code: '409',
+    });
+  }
+
   //TODO Make the userId from auth, remove this manual one
   const cart = await Cart.findOneAndUpdate(
     { userId: '64d161922d094064e1c353b6' },

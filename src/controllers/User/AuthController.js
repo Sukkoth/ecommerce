@@ -6,6 +6,7 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
 const loginValidation = require('../../validation/User/loginUser');
 const generateToken = require('../../utils/generateToken');
 const Cart = require('../../models/Cart');
+const WishList = require('../../models/WishList');
 /**
  * @desc register a user
  * @route POST /users/auth/register
@@ -26,10 +27,12 @@ const register = asyncHanlder(async (req, res) => {
 
   const user = await User.create({ ...validated, password: hashedPassword });
   const cart = await Cart.create({ userId: user._id });
+  const wishList = await WishList.create({ user: user._id });
   res.status(201).json({
     message: 'User created',
     user,
     cart,
+    wishList,
   });
 });
 
