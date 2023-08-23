@@ -9,13 +9,40 @@ const Category = require('../models/Category');
  */
 const getAllCategories = asyncHandler(async (req, res) => {
   // const categories = await Category.find({ isActive: true });
+  // const categories = await Category.aggregate([
+  //   {
+  //     $match: { isActive: true },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'products',
+  //       localField: '_id',
+  //       foreignField: 'category',
+  //       as: 'products',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       productsCount: { $size: '$products' },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 1,
+  //       name: 1,
+  //       description: 1,
+  //       imageUrl: 1,
+  //       productsCount: 1,
+  //       isActive: 1,
+  //       createdAt: 1,
+  //       updatedAt: 1,
+  //     },
+  //   },
+  // ]);
   const categories = await Category.aggregate([
     {
-      $match: { isActive: true },
-    },
-    {
       $lookup: {
-        from: 'products',
+        from: 'products', // Assuming your products collection is named 'products'
         localField: '_id',
         foreignField: 'category',
         as: 'products',
@@ -23,7 +50,19 @@ const getAllCategories = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        productsCount: { $size: '$products' },
+        firstProduct: { $arrayElemAt: ['$products', 0] },
+        firstVariation: { $arrayElemAt: ['$products.variations', 0] },
+      },
+    },
+    {
+      $addFields: {
+        imageUrl: {
+          $cond: {
+            if: { $isArray: '$firstVariation.images' },
+            then: { $arrayElemAt: ['$firstVariation.images', 0] },
+            else: [], // Empty array if no images
+          },
+        },
       },
     },
     {
@@ -32,13 +71,16 @@ const getAllCategories = asyncHandler(async (req, res) => {
         name: 1,
         description: 1,
         imageUrl: 1,
-        productsCount: 1,
         isActive: 1,
         createdAt: 1,
         updatedAt: 1,
+        productsCount: {
+          $size: '$products',
+        },
       },
     },
   ]);
+
   res.json({
     status: 'ok',
     code: '200',
