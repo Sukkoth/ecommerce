@@ -21,7 +21,7 @@ const register = asyncHanlder(async (req, res) => {
     createUserValidation.validate(req.body, { abortEarly: false });
 
   if (validationError)
-    return res.json(parseValidationErrors(validationError.details));
+    return res.status(422).json(parseValidationErrors(validationError.details));
 
   const hashedPassword = await bcrypt.hash(validated.password, 10);
 
@@ -53,7 +53,7 @@ const login = asyncHanlder(async (req, res) => {
   );
 
   if (validationError)
-    return res.json(parseValidationErrors(validationError.details));
+    return res.status(422).json(parseValidationErrors(validationError.details));
 
   const user = await User.findOne({ email: validated.email.toLowerCase() });
 
