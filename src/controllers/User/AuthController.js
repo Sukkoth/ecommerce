@@ -25,14 +25,19 @@ const register = asyncHanlder(async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(validated.password, 10);
 
-  const user = await User.create({ ...validated, password: hashedPassword });
-  const cart = await Cart.create({ userId: user._id });
-  const wishList = await WishList.create({ user: user._id });
+  const user = await User.create({
+    ...validated,
+    password: hashedPassword,
+    email: validated.email.toLowerCase(),
+  });
+
+  let withoutPassword = { ...user._doc };
+  delete withoutPassword.password;
+
   res.status(201).json({
     message: 'User created',
-    user,
-    cart,
-    wishList,
+    user: withoutPassword,
+    token: generateToken(user._id),
   });
 });
 
@@ -50,7 +55,14 @@ const login = asyncHanlder(async (req, res) => {
   if (validationError)
     return res.json(parseValidationErrors(validationError.details));
 
-  const user = await User.findOne({ email: validated.email });
+  const user = await User.findOne({ email: validated.email.toLowerCase() });
+
+  if (!user) {
+    res.status(401).json({
+      status: 'unauthenticated',
+      message: 'Incorrect credentials',
+    });
+  }
 
   const passwordMatch = await bcrypt.compare(validated.password, user.password);
 
@@ -61,9 +73,12 @@ const login = asyncHanlder(async (req, res) => {
     });
   }
 
+  let withoutPassword = { ...user._doc };
+  delete withoutPassword.password;
+
   res.json({
     message: 'User found',
-    user,
+    user: withoutPassword,
     token: generateToken(user._id),
   });
 });
