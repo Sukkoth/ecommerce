@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const cartController = require('../../controllers/Cart/CartController');
+const authMiddleware = require('../../middleware/authMiddleware');
 const cartShouldExist =
   require('../../middleware/CartMiddleware').cartShouldExist;
 /**
@@ -7,14 +8,14 @@ const cartShouldExist =
  * @route /carts
  * @method GET
  */
-router.get('/', cartController.getAllCarts);
+router.get('/', authMiddleware, cartController.getAllCarts);
 
 /**
  * @desc Store cart
  * @route POST /carts
  * @returns {object}
  */
-router.post('/', cartController.addToCart);
+router.post('/', authMiddleware, cartController.addToCart);
 
 /**
  * @desc view a single cart
@@ -22,7 +23,12 @@ router.post('/', cartController.addToCart);
  * @param {string} cartId
  * @returns {object}
  */
-router.get('/:cartId', cartShouldExist, cartController.getCartById);
+router.get(
+  '/:cartId',
+  authMiddleware,
+  cartShouldExist,
+  cartController.getCartById
+);
 
 /**
  * @desc Update cart item
@@ -30,14 +36,19 @@ router.get('/:cartId', cartShouldExist, cartController.getCartById);
  * @param {string} itemId
  * @returns {object}
  */
-router.put('/:itemId', cartController.updateCartItem);
+router.put('/:itemId', authMiddleware, cartController.updateCartItem);
 /**
  * @desc Update cart
  * @route PUT /carts/:cartId
  * @param {string} cartId
  * @returns {object}
  */
-router.put('/:cartId', cartShouldExist, cartController.updateCart);
+router.put(
+  '/:cartId',
+  authMiddleware,
+  cartShouldExist,
+  cartController.updateCart
+);
 
 /**
  * @desc Delete cart
@@ -45,7 +56,7 @@ router.put('/:cartId', cartShouldExist, cartController.updateCart);
  * @param {string} cartId
  * @returns {string} cartId
  */
-router.delete('/:itemId', cartController.removeFromCart);
+router.delete('/:itemId', authMiddleware, cartController.removeFromCart);
 
 // /**
 //  * @desc variation routes for specific cart

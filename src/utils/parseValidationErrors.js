@@ -1,19 +1,19 @@
 const parseValidationErrors = (errors) => {
-    const details = errors.map((error) => {
-        return {
-            path: error.path[0],
-            message: error.message,
-            type: error.type,
-        };
-    });
-
-    const parsedError = {
-        message: 'Validation Error',
-        code: '422',
-        details,
+  const details = {};
+  errors.forEach((error) => {
+    details[error.path[0]] = {
+      path: error.path[0],
+      message: error.message,
     };
+  });
 
-    return parsedError;
+  const parsedError = {
+    message: 'Validation Error',
+    code: '422',
+    details,
+  };
+
+  return parsedError;
 };
 
 module.exports = parseValidationErrors;

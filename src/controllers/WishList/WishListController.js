@@ -10,7 +10,7 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
  * @returns {object}
  */
 const getWishList = asyncHandler(async (req, res) => {
-  const wishList = await WishList.findOne({ user: '64d161922d094064e1c353b6' });
+  const wishList = await WishList.findOne({ user: req.user._id });
   res.json({
     wishList,
   });
@@ -43,7 +43,7 @@ const addToWishList = asyncHandler(async (req, res) => {
 
   //TODO Make the userId from auth, remove this manual one
   const wishList = await WishList.findOneAndUpdate(
-    { user: '64d161922d094064e1c353b6' },
+    { user: req.user._id },
     { $push: { items: validated } },
     { new: true }
   );
@@ -65,7 +65,7 @@ const removeFroWishList = asyncHandler(async (req, res) => {
   const { itemId } = req.params;
 
   const wishList = await WishList.findOneAndUpdate(
-    { user: '64d161922d094064e1c353b6' },
+    { user: req.user._id },
     { $pull: { items: { _id: itemId } } },
     { new: true }
   );

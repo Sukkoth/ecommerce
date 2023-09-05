@@ -21,15 +21,33 @@ const register = asyncHanlder(async (req, res) => {
     createUserValidation.validate(req.body, { abortEarly: false });
 
   if (validationError)
-    return res.json(parseValidationErrors(validationError.details));
+    return res.status(422).json(parseValidationErrors(validationError.details));
 
   const hashedPassword = await bcrypt.hash(validated.password, 10);
+
+  const userFound = await User.findOne({ email: validated.email });
+
+  if (userFound) {
+    return res.status(422).json({
+      message: 'Validation Error',
+      code: '422',
+      details: {
+        email: {
+          path: 'email',
+          message: 'Email address is already taken',
+        },
+      },
+    });
+  }
 
   const user = await User.create({
     ...validated,
     password: hashedPassword,
     email: validated.email.toLowerCase(),
   });
+
+  await Cart.create({ user: user._id, items: [] });
+  await WishList.create({ user: user._id, items: [] });
 
   let withoutPassword = { ...user._doc };
   delete withoutPassword.password;
@@ -53,7 +71,7 @@ const login = asyncHanlder(async (req, res) => {
   );
 
   if (validationError)
-    return res.json(parseValidationErrors(validationError.details));
+    return res.status(422).json(parseValidationErrors(validationError.details));
 
   const user = await User.findOne({ email: validated.email.toLowerCase() });
 

@@ -1,13 +1,14 @@
-const errorMiddleware = (err, req, res) => {
-  const statusCode = res.statusCode != 200 ? res.statusCode : 500;
-  console.log('STATUS CODE', statusCode);
+const { APP_ENV } = require('../../config/env');
 
-  if (err) {
-    return res.status(statusCode).json({
-      message: err.message,
-      stack: err.stack,
-    });
-  }
+const errorHandler = (err, req, res, next) => {
+  const statusCode = req.statusCode != 200 ? res.statusCode : 500;
+
+  res.status(statusCode);
+
+  res.json({
+    message: err.message,
+    stack: APP_ENV == 'production' ? null : err.stack,
+  });
 };
 
-module.exports = errorMiddleware;
+module.exports = errorHandler;

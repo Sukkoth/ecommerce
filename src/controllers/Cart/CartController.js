@@ -10,9 +10,10 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
  * @returns {object}
  */
 const getAllCarts = asyncHandler(async (req, res) => {
+  // await Cart.create({ user: req.user._id, items: [] });
   const cart = await Cart.findOne({
-    userId: '64d161922d094064e1c353b6',
-  }).populate({ path: 'items.productId', model: 'Product' });
+    user: req.user._id,
+  }).populate({ path: 'items.product', model: 'Product' });
 
   res.json({
     status: 'ok',
@@ -30,7 +31,7 @@ const addToCart = asyncHandler(async (req, res) => {
   /**
    * Take the items only since the cart is created whenever a new user is registered
    * Add new cart item to 'items' array.
-   * Take, {productId, variationIndex and quantity}
+   * Take, {product, variationIndex and quantity}
    */
   const { error: validationError, value: validated } =
     cartItemValidationSchema.validate(req.body, { abortEarly: false });
@@ -39,8 +40,10 @@ const addToCart = asyncHandler(async (req, res) => {
     res.status(422).json(parseValidationErrors(validationError.details));
   }
 
+  console.log('validated', validated);
+
   const search = await Cart.findOne({
-    'items.productId': validated.productId,
+    'items.product': validated.product,
     'items.variationIndex': validated.variationIndex,
   });
 
@@ -48,12 +51,12 @@ const addToCart = asyncHandler(async (req, res) => {
     return res.status(409).json({
       message: 'Item is already in cart',
       code: '409',
+      search,
     });
   }
 
-  //TODO Make the userId from auth, remove this manual one
   const cart = await Cart.findOneAndUpdate(
-    { userId: '64d161922d094064e1c353b6' },
+    { user: req.user._id },
     { $push: { items: validated } },
     { new: true }
   );
@@ -120,7 +123,7 @@ const updateCartItem = asyncHandler(async (req, res) => {
   const { itemId } = req.params;
 
   const cart = await Cart.findOneAndUpdate(
-    { userId: '64d161922d094064e1c353b6', 'items._id': itemId },
+    { user: req.user._id, 'items._id': itemId },
     { $set: { 'items.$': req.body } },
     { new: true }
   );
@@ -142,7 +145,7 @@ const removeFromCart = asyncHandler(async (req, res) => {
   const { itemId } = req.params;
 
   const cart = await Cart.findOneAndUpdate(
-    { userId: '64d161922d094064e1c353b6' },
+    { user: req.user._id },
     { $pull: { items: { _id: itemId } } },
     { new: true }
   );
