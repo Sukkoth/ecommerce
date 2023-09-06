@@ -30,6 +30,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) =>
   res.json({ message: 'Welcome to Eshop API Service' })
 );
+app.get('/api', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+  res.json({ message: 'This is API Endpoint' });
+});
 app.use('/api/products', require('./routes/Product/productRoutes'));
 app.use('/api/carts', require('./routes/Cart/cartRoutes'));
 app.use('/api/wishList', require('./routes/WishList/wishListRoutes'));
