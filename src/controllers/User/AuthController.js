@@ -29,7 +29,7 @@ const register = asyncHanlder(async (req, res) => {
 
   if (userFound) {
     return res.status(422).json({
-      message: 'Validation Error',
+      message: 'Could not create user',
       code: '422',
       details: {
         email: {
@@ -40,23 +40,31 @@ const register = asyncHanlder(async (req, res) => {
     });
   }
 
-  const user = await User.create({
-    ...validated,
-    password: hashedPassword,
-    email: validated.email.toLowerCase(),
-  });
+  try {
+    const user = await User.create({
+      ...validated,
+      password: hashedPassword,
+      email: validated.email.toLowerCase(),
+    });
 
-  await Cart.create({ user: user._id, items: [] });
-  await WishList.create({ user: user._id, items: [] });
+    await Cart.create({ user: user._id, items: [] });
+    await WishList.create({ user: user._id, items: [] });
 
-  let withoutPassword = { ...user._doc };
-  delete withoutPassword.password;
+    let withoutPassword = { ...user._doc };
+    delete withoutPassword.password;
 
-  res.status(201).json({
-    message: 'User created',
-    user: withoutPassword,
-    token: generateToken(user._id),
-  });
+    res.status(201).json({
+      message: 'User created',
+      user: withoutPassword,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    console.error('ERROR WHILE CREATING USER', error);
+    res.status(500).json({
+      message: 'Failed to create user',
+      error,
+    });
+  }
 });
 
 /**
