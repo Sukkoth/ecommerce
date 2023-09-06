@@ -40,17 +40,24 @@ const addToCart = asyncHandler(async (req, res) => {
     res.status(422).json(parseValidationErrors(validationError.details));
   }
 
-  console.log('validated', validated);
-
   const search = await Cart.findOne({
-    'items.product': validated.product,
-    'items.variationIndex': validated.variationIndex,
+    user: req.user._id,
+  });
+  let found = false;
+  search.items.forEach((item) => {
+    if (
+      item.product === validated.product &&
+      item.variationIndex === validated.variationIndex
+    )
+      return (found = true);
   });
 
-  if (search) {
+  if (found) {
     return res.status(409).json({
       message: 'Item is already in cart',
       code: '409',
+      product: validated.product,
+      variation: validated.variationIndex,
       search,
     });
   }
