@@ -6,6 +6,9 @@ const env = {
     process.env.APP_KEY ||
     'e8b495f1b7458a24a5cb2a9c14d8d39c8f0f07a7d5c634878c2e70412687628d',
   app_mode: process.env.APP_MODE || 'dev',
+  front_end_url: process.env.FRONT_END_URL,
+  payment_success_redirect: this.front_end_url + '/payment-success',
+  payment_failed_redirect: this.front_end_url + '/payment-failed',
 };
 
 module.exports = env;
