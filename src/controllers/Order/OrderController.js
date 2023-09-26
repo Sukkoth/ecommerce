@@ -32,6 +32,18 @@ const placeOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ user: req.user._id });
+
+  res.json({
+    message: 'Orders List',
+    status: 'ok',
+    code: '200',
+    orders,
+  });
+});
+
 module.exports = {
   placeOrder,
+  getAllOrders,
 };
