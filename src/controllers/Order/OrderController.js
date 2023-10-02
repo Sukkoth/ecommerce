@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const orderValidationSchema = require('../../validation/Order/OrderValidationSchema');
 const parseValidationErrors = require('../../utils/parseValidationErrors');
 const Order = require('../../models/Order');
+const Cart = require('../../models/Cart');
 
 const placeOrder = asyncHandler(async (req, res) => {
   //store items
@@ -23,6 +24,8 @@ const placeOrder = asyncHandler(async (req, res) => {
     shipmentPrice: value.shipmentPrice,
     paymentMethod: value.paymentMethod,
   });
+
+  await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
 
   res.status(201).json({
     message: 'Order Placed',

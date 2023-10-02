@@ -1,9 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
-const stripe = require('stripe')(
-  'sk_test_51KUHzQB3tJUunZUS9z4fDi5qeVEvesG3lyPB2RSWBZ4YWPH5MIevE43UjAuH3EVKyuwnVUL36w5DvRXgFSLnkRhY0051qSBCSN'
-);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const env = require('../../config/env');
 
@@ -41,13 +39,7 @@ const makePayment = asyncHandler(async (req, res) => {
 const paymentSuccess = asyncHandler(async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
   const orderId = session.metadata.orderId;
-  const order = await Order.findByIdAndUpdate(
-    orderId,
-    { status: 'pending' },
-    { new: true }
-  );
-
-  const cart = await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
+  await Order.findByIdAndUpdate(orderId, { status: 'pending' }, { new: true });
 
   res.redirect(302, env.front_end_url + '/orders');
 });
