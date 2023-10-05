@@ -30,11 +30,19 @@ const addToWishList = asyncHandler(async (req, res) => {
   }
 
   const search = await WishList.findOne({
-    'items.product': validated.product,
-    'items.variationIndex': validated.variationIndex,
+    user: req.user._id,
   });
 
-  if (search) {
+  let found = false;
+  search.items.forEach((item) => {
+    if (
+      item.product === validated.product &&
+      item.variationIndex === validated.variationIndex
+    )
+      return (found = true);
+  });
+
+  if (found) {
     return res.status(409).json({
       message: 'Item is already in wishlist',
       code: '409',
