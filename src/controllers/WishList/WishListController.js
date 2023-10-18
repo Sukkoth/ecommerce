@@ -10,7 +10,20 @@ const parseValidationErrors = require('../../utils/parseValidationErrors');
  * @returns {object}
  */
 const getWishList = asyncHandler(async (req, res) => {
-  const wishList = await WishList.findOne({ user: req.user._id });
+  const populate = req.query.populate;
+  console.log(populate, req.query);
+
+  let wishList;
+
+  if (populate === 'products') {
+    wishList = await WishList.findOne({ user: req.user._id }).populate({
+      path: 'items.product',
+      model: 'Product',
+    });
+  } else {
+    wishList = await WishList.findOne({ user: req.user._id });
+  }
+
   res.json({
     wishList,
   });
@@ -33,20 +46,25 @@ const addToWishList = asyncHandler(async (req, res) => {
     user: req.user._id,
   });
 
-  let found = false;
-  search.items.forEach((item) => {
-    if (
-      item.product === validated.product &&
-      item.variationIndex === validated.variationIndex
-    )
-      return (found = true);
-  });
+  if (!search) {
+    await WishList.create({ user: req.user._id, items: [] });
+  }
 
-  if (found) {
-    return res.status(409).json({
-      message: 'Item is already in wishlist',
-      code: '409',
+  let found = false;
+  if (search) {
+    search.items.forEach((item) => {
+      if (
+        item.product === validated.product &&
+        item.variationIndex === validated.variationIndex
+      )
+        return (found = true);
     });
+    if (found) {
+      return res.status(409).json({
+        message: 'Item is already in wishlist',
+        code: '409',
+      });
+    }
   }
 
   //TODO Make the userId from auth, remove this manual one
